@@ -17,7 +17,15 @@ const NewHomePage = ({ tempUnit }) => {
   const [loading, setLoading] = useState(true);
 
   // Thành phố nổi bật
-  const featuredCities = ['Hanoi', 'Ha Giang', 'Quang Ninh', 'Hai Phong'];
+  const featuredCities = [
+  'Hanoi',
+  'Ha Giang',
+  'Quang Ninh',
+  'Hai Phong',
+  'Da Nang',
+  'Ho Chi Minh'
+];
+
 
   // Mock data cho 5-day chart
   const fiveDayChartData = [

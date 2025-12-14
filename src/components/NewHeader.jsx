@@ -1,7 +1,10 @@
 import React from 'react';
 import { Cloud } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const NewHeader = () => {
+  const navigate = useNavigate();
+
   const currentTime = new Date().toLocaleTimeString('en-US', { 
     hour: '2-digit', 
     minute: '2-digit', 
@@ -12,12 +15,18 @@ const NewHeader = () => {
     <header className="bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo & Title */}
-          <div className="flex items-center gap-3">
+          
+          {/* Logo & Title (CLICKABLE) */}
+          <div
+            onClick={() => navigate('/')}
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+          >
             <div className="bg-gradient-to-br from-blue-400 to-yellow-400 p-2 rounded-lg">
               <Cloud className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">Environmental Monitoring</h1>
+            <h1 className="text-2xl font-bold text-white">
+              Environmental Monitoring
+            </h1>
           </div>
 
           {/* Time */}

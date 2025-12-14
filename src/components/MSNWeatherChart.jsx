@@ -80,8 +80,8 @@ const MSNWeatherChart = ({ data = [] }) => {
   `;
 
   return (
-    <div className="w-full overflow-x-auto bg-slate-800 rounded-lg">
-      <div style={{ width: `${width}px` }}>
+    <div className="overflow-x-auto bg-slate-800 rounded-lg" style={{ maxWidth: '100%' }}>
+      <div style={{ width: `${width}px`, minWidth: `${width}px` }}>
         <svg
           width={width}
           height={HEIGHT}
@@ -226,7 +226,7 @@ const DemoApp = () => {
 
   return (
     <div className="min-h-screen bg-slate-900 p-8">
-      <div className="max-w-full">
+      <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-6">
           Biểu đồ nhiệt độ 24 giờ
         </h1>

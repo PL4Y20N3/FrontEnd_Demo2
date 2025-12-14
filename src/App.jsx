@@ -2,19 +2,28 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import NewHomePage from './components/NewHomePage';
 import UnifiedCityPage from './components/UnifiedCityPage';
+import ScrollToTop from './components/ScrollToTop';
 
-// Main App Component
 function App() {
   const [tempUnit, setTempUnit] = useState('C');
 
   return (
     <BrowserRouter>
+      {/* Tự động scroll lên đầu khi đổi route */}
+      <ScrollToTop />
+
       <Routes>
-        {/* Home Page - Giao diện mới */}
-        <Route path="/" element={<NewHomePage tempUnit={tempUnit} />} />
-        
-        {/* Unified City Page - Tất cả info trong 1 trang */}
-        <Route path="/city/:cityName" element={<UnifiedCityPage />} />
+        {/* Trang chủ */}
+        <Route
+          path="/"
+          element={<NewHomePage tempUnit={tempUnit} />}
+        />
+
+        {/* Trang chi tiết thành phố */}
+        <Route
+          path="/city/:cityName"
+          element={<UnifiedCityPage />}
+        />
       </Routes>
     </BrowserRouter>
   );
