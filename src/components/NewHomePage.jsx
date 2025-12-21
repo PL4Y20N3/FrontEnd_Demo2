@@ -6,7 +6,13 @@ import MSNWeatherChart from './MSNWeatherChart';
 import FiveDayChart from './FiveDayChart';
 import MonthCalendar from './MonthCalendar';
 import WeatherWidget from './WeatherWidget';
+import { useAuth } from '../contexts/AuthContext';
 import { fetchCombinedWeatherData } from '../services/multiApiService';
+import WeatherNewsWidget from './WeatherNewsWidget';
+const YourPage = () => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+};
 
 const NewHomePage = () => {
   const navigate = useNavigate();
@@ -249,6 +255,9 @@ const NewHomePage = () => {
                       frameBorder="0"
                       title="Windy Map"
                     />
+                  </div>
+                  <div className="mt-6">
+                    <WeatherNewsWidget />
                   </div>
                 </div>
               </div>

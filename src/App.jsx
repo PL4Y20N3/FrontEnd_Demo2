@@ -8,7 +8,7 @@ import CommunityLobby from './components/CommunityLobby';
 import ChatRoom from './components/ChatRoom';
 import ScrollToTop from './components/ScrollToTop';
 import CommunityWeatherChat from './components/CommunityWeatherChat';
-
+import AQIPage from './components/AQIPage';
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Sun, Cloud, CloudRain, Wind, Droplets, Eye } from 'lucide-react';
+import {
+  ArrowLeft,
+  Sun,
+  Cloud,
+  CloudRain,
+  Wind,
+  Droplets,
+  Eye
+} from 'lucide-react';
 import { getAllWeatherData } from '../services/weatherService';
 import { convertTemp } from '../utils/helpers';
 
@@ -23,13 +31,13 @@ const CityDetailPage = ({ city, tempUnit, onBack }) => {
 
   if (loading || !detailData) {
     return (
-      <div className="flex-1 p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500"></div>
+      <div className="flex-1 flex items-center justify-center bg-slate-100 dark:bg-slate-900 transition-colors">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-500" />
       </div>
     );
   }
 
-  // Mock data cho biểu đồ 7 ngày
+  /* ===== MOCK WEEKLY ===== */
   const weeklyForecast = [
     { day: 'T2', date: '12/12', high: 21, low: 18, rain: 0, icon: 'cloud' },
     { day: 'T3', date: '13/12', high: 20, low: 17, rain: 100, icon: 'rain' },
@@ -40,82 +48,91 @@ const CityDetailPage = ({ city, tempUnit, onBack }) => {
   ];
 
   const getWeatherIcon = (type) => {
-    switch(type) {
-      case 'sun': return <Sun className="w-8 h-8 text-yellow-400" />;
-      case 'rain': return <CloudRain className="w-8 h-8 text-blue-400" />;
-      default: return <Cloud className="w-8 h-8 text-gray-400" />;
+    switch (type) {
+      case 'sun':
+        return <Sun className="w-7 h-7 text-yellow-400" />;
+      case 'rain':
+        return <CloudRain className="w-7 h-7 text-blue-400" />;
+      default:
+        return <Cloud className="w-7 h-7 text-slate-400 dark:text-slate-300" />;
     }
   };
 
   return (
-    <div className="flex-1 p-6 max-h-[calc(100vh-140px)] overflow-y-auto">
+    <div className="flex-1 p-6 bg-slate-100 dark:bg-slate-900 transition-colors overflow-y-auto">
       <div className="max-w-7xl mx-auto">
-        {/* Back Button */}
+
+        {/* BACK */}
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+          className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-500 mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Quay lại</span>
+          Quay lại
         </button>
 
-        {/* Main Weather Display */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-8 mb-6 shadow-2xl">
-          <div className="flex items-start justify-between mb-6">
+        {/* MAIN WEATHER */}
+        <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-3xl p-8 mb-6 shadow-xl">
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-white text-4xl font-bold mb-2">{city}</h1>
+              <h1 className="text-white text-4xl font-bold mb-1">{city}</h1>
               <p className="text-white/80">{detailData.date}</p>
               <p className="text-white/60 text-sm mt-1">
-                Mặt trời mọc 6:23 AM • Mặt trời lặn 5:15 PM
+                Mặt trời mọc 6:23 • Lặn 17:15
               </p>
             </div>
+
             <div className="text-right">
-              <div className="text-white text-7xl font-bold">
+              <div className="text-white text-7xl font-bold leading-none">
                 {convertTemp(detailData.temp, tempUnit)}°
               </div>
-              <p className="text-white/80 text-lg capitalize">{detailData.condition}</p>
+              <p className="text-white/90 text-lg capitalize">
+                {detailData.condition}
+              </p>
             </div>
           </div>
 
-          {/* Weather Stats */}
-          <div className="grid grid-cols-4 gap-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <Droplets className="w-6 h-6 text-white/80 mb-2" />
-              <div className="text-white/60 text-xs">Độ ẩm</div>
-              <div className="text-white text-xl font-bold">{detailData.humidity}%</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <Eye className="w-6 h-6 text-white/80 mb-2" />
-              <div className="text-white/60 text-xs">Tầm nhìn</div>
-              <div className="text-white text-xl font-bold">{detailData.visibility}km</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <Wind className="w-6 h-6 text-white/80 mb-2" />
-              <div className="text-white/60 text-xs">Gió</div>
-              <div className="text-white text-xl font-bold">{detailData.wind}mph</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-              <Sun className="w-6 h-6 text-white/80 mb-2" />
-              <div className="text-white/60 text-xs">UV</div>
-              <div className="text-white text-xl font-bold">1.29</div>
-            </div>
+          {/* STATS */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { icon: Droplets, label: 'Độ ẩm', value: `${detailData.humidity}%` },
+              { icon: Eye, label: 'Tầm nhìn', value: `${detailData.visibility} km` },
+              { icon: Wind, label: 'Gió', value: `${detailData.wind} mph` },
+              { icon: Sun, label: 'UV', value: '1.29' },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white/15 backdrop-blur-md rounded-xl p-4"
+              >
+                <item.icon className="w-6 h-6 text-white/80 mb-2" />
+                <div className="text-white/70 text-xs">{item.label}</div>
+                <div className="text-white text-xl font-bold">{item.value}</div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Hourly Forecast */}
-        <div className="bg-gray-800/90 backdrop-blur-md rounded-2xl p-6 mb-6 border border-gray-700/50">
-          <h3 className="text-white text-xl font-bold mb-4">Dự báo thời tiết theo giờ</h3>
+        {/* HOURLY */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 mb-6 border border-slate-200 dark:border-slate-700">
+          <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-4">
+            Dự báo theo giờ
+          </h3>
           <div className="flex gap-4 overflow-x-auto pb-2">
-            {detailData.hourly && detailData.hourly.map((hour, idx) => (
-              <div key={idx} className="flex-shrink-0 bg-gray-700/50 rounded-xl p-4 text-center min-w-[100px]">
-                <div className="text-white/80 text-sm mb-2">{hour.time}</div>
-                <div className="text-white mb-2">
+            {detailData.hourly?.map((hour, idx) => (
+              <div
+                key={idx}
+                className="min-w-[100px] text-center bg-slate-100 dark:bg-slate-700 rounded-xl p-4"
+              >
+                <div className="text-slate-500 dark:text-slate-300 text-sm mb-2">
+                  {hour.time}
+                </div>
+                <div className="flex justify-center mb-2">
                   {getWeatherIcon(hour.icon)}
                 </div>
-                <div className="text-white text-xl font-bold">
+                <div className="text-slate-900 dark:text-white text-xl font-bold">
                   {convertTemp(hour.temp, tempUnit)}°
                 </div>
-                <div className="text-blue-400 text-xs mt-2">
+                <div className="text-blue-500 text-xs mt-1">
                   {Math.round(Math.random() * 100)}%
                 </div>
               </div>
@@ -123,29 +140,45 @@ const CityDetailPage = ({ city, tempUnit, onBack }) => {
           </div>
         </div>
 
-        {/* Weekly Forecast */}
-        <div className="bg-gray-800/90 backdrop-blur-md rounded-2xl p-6 mb-6 border border-gray-700/50">
-          <h3 className="text-white text-xl font-bold mb-4">Dự báo thời tiết những ngày tới</h3>
+        {/* WEEKLY */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 mb-6 border border-slate-200 dark:border-slate-700">
+          <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-4">
+            Những ngày tới
+          </h3>
           <div className="space-y-3">
             {weeklyForecast.map((day, idx) => (
-              <div key={idx} className="flex items-center gap-4 bg-gray-700/30 rounded-xl p-4 hover:bg-gray-700/50 transition-colors">
+              <div
+                key={idx}
+                className="flex items-center gap-4 p-4 rounded-xl
+                  bg-slate-100 dark:bg-slate-700
+                  hover:bg-slate-200 dark:hover:bg-slate-600 transition"
+              >
                 <div className="w-20">
-                  <div className="text-white font-semibold">{day.day}</div>
-                  <div className="text-white/60 text-sm">{day.date}</div>
-                </div>
-                <div className="flex-shrink-0">
-                  {getWeatherIcon(day.icon)}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-semibold">{day.high}°</span>
-                    <span className="text-white/60">/ {day.low}°</span>
+                  <div className="text-slate-900 dark:text-white font-semibold">
+                    {day.day}
                   </div>
+                  <div className="text-slate-500 dark:text-slate-400 text-sm">
+                    {day.date}
+                  </div>
+                </div>
+
+                {getWeatherIcon(day.icon)}
+
+                <div className="flex-1">
+                  <span className="text-slate-900 dark:text-white font-semibold">
+                    {day.high}°
+                  </span>
+                  <span className="text-slate-500 dark:text-slate-400">
+                    {' '} / {day.low}°
+                  </span>
                   {day.rain > 0 && (
-                    <div className="text-blue-400 text-sm">{day.rain}% mưa</div>
+                    <div className="text-blue-500 text-sm">
+                      {day.rain}% mưa
+                    </div>
                   )}
                 </div>
-                <div className="text-white/60 text-sm">
+
+                <div className="text-slate-500 dark:text-slate-400 text-sm">
                   {day.rain > 0 ? `${(day.rain / 10).toFixed(1)} mm` : '0 mm'}
                 </div>
               </div>
@@ -153,28 +186,33 @@ const CityDetailPage = ({ city, tempUnit, onBack }) => {
           </div>
         </div>
 
-        {/* Today's Details */}
-        <div className="bg-gray-800/90 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50">
-          <h3 className="text-white text-xl font-bold mb-4">Chi tiết hôm nay</h3>
+        {/* TODAY DETAILS */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+          <h3 className="text-slate-900 dark:text-white text-xl font-bold mb-4">
+            Chi tiết hôm nay
+          </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-700/30 rounded-xl p-4">
-              <div className="text-white/60 text-sm mb-1">Cảm giác như</div>
-              <div className="text-white text-2xl font-bold">{convertTemp(detailData.temp, tempUnit)}°</div>
-            </div>
-            <div className="bg-gray-700/30 rounded-xl p-4">
-              <div className="text-white/60 text-sm mb-1">Điểm sương</div>
-              <div className="text-white text-2xl font-bold">18.4°</div>
-            </div>
-            <div className="bg-gray-700/30 rounded-xl p-4">
-              <div className="text-white/60 text-sm mb-1">Áp suất</div>
-              <div className="text-white text-2xl font-bold">1013 hPa</div>
-            </div>
-            <div className="bg-gray-700/30 rounded-xl p-4">
-              <div className="text-white/60 text-sm mb-1">Chỉ số UV</div>
-              <div className="text-white text-2xl font-bold">1.29</div>
-            </div>
+            {[
+              { label: 'Cảm giác như', value: `${convertTemp(detailData.temp, tempUnit)}°` },
+              { label: 'Điểm sương', value: '18.4°' },
+              { label: 'Áp suất', value: '1013 hPa' },
+              { label: 'UV', value: '1.29' },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-slate-100 dark:bg-slate-700 rounded-xl p-4"
+              >
+                <div className="text-slate-500 dark:text-slate-400 text-sm mb-1">
+                  {item.label}
+                </div>
+                <div className="text-slate-900 dark:text-white text-2xl font-bold">
+                  {item.value}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+
       </div>
     </div>
   );
