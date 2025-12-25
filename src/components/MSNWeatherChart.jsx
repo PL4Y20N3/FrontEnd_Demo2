@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Sun, Cloud, CloudRain, Moon } from "lucide-react";
 
-/* ===================== CONFIG ===================== */
+/* ===================== CONSTANTS ===================== */
 const HEIGHT = 270;
 const TOP_PADDING = 56;
 const BOTTOM_PADDING = 32;
 const MIN_TEMP_RANGE = 5;
 const ITEM_WIDTH = 72;
+const MIN_WIDTH = 860;
 
 /* ===================== ICON ===================== */
-const WeatherIcon = ({ type }) => {
+const WeatherIcon = React.memo(({ type }) => {
   switch (type) {
     case "sun":
       return <Sun className="w-6 h-6 text-yellow-400" />;
@@ -20,7 +21,7 @@ const WeatherIcon = ({ type }) => {
     default:
       return <Cloud className="w-6 h-6 text-sky-400" />;
   }
-};
+});
 
 /* ===================== UTILS ===================== */
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -37,58 +38,70 @@ const buildSmoothPath = (points) => {
   return d;
 };
 
-/* ===================== COMPONENT ===================== */
-const MSNWeatherChart = ({ data = [] }) => {
-  if (!data.length) return null;
+/* ===================== MAIN COMPONENT ===================== */
+const MSNWeatherChart = ({ data }) => {
+  /** ========== SAFE GUARD ========== */
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="h-[260px] flex items-center justify-center text-slate-400">
+        Không có dữ liệu thời tiết
+      </div>
+    );
+  }
 
-  const totalWidth = data.length * ITEM_WIDTH;
-  const width = Math.max(totalWidth, 860);
+  /** ========== PRE-CALC ========== */
+  const {
+    width,
+    points,
+    curvePath,
+    fillPath
+  } = useMemo(() => {
+    const totalWidth = data.length * ITEM_WIDTH;
+    const width = Math.max(totalWidth, MIN_WIDTH);
 
-  const rawMax = Math.max(...data.map(d => d.temp));
-  const rawMin = Math.min(...data.map(d => d.temp));
-  const range = Math.max(rawMax - rawMin, MIN_TEMP_RANGE);
+    const temps = data.map(d => d.temp);
+    const maxTemp = Math.max(...temps);
+    const minTemp = Math.min(...temps);
+    const range = Math.max(maxTemp - minTemp, MIN_TEMP_RANGE);
 
-  const scaleY = (t) => {
-    const normalized = clamp((t - rawMin) / range, 0.05, 0.95);
-    const CHART_TOP = TOP_PADDING + 24;
-    return CHART_TOP + (1 - normalized) * (HEIGHT - CHART_TOP - BOTTOM_PADDING);
-  };
+    const scaleY = (temp) => {
+      const normalized = clamp((temp - minTemp) / range, 0.05, 0.95);
+      const CHART_TOP = TOP_PADDING + 24;
+      return CHART_TOP + (1 - normalized) * (HEIGHT - CHART_TOP - BOTTOM_PADDING);
+    };
 
-  const points = data.map((d, i) => ({
-    x: i * ITEM_WIDTH + ITEM_WIDTH / 2,
-    y: scaleY(d.temp),
-  }));
+    const points = data.map((d, i) => ({
+      x: i * ITEM_WIDTH + ITEM_WIDTH / 2,
+      y: scaleY(d.temp),
+    }));
 
-  const curvePath = buildSmoothPath(points);
-  const fillPath = `${curvePath} L ${width} ${HEIGHT} L 0 ${HEIGHT} Z`;
+    const curvePath = buildSmoothPath(points);
+    const fillPath = `${curvePath} L ${width} ${HEIGHT} L 0 ${HEIGHT} Z`;
 
+    return { width, points, curvePath, fillPath };
+  }, [data]);
+
+  /** ========== RENDER ========== */
   return (
     <div
-      className="
-        overflow-x-auto rounded-2xl p-4
-        bg-white
-        dark:bg-slate-800
-        transition-colors
-      "
+      className="overflow-x-auto rounded-2xl p-4 bg-white dark:bg-slate-800 transition-colors"
       style={{ maxWidth: "100%" }}
     >
-      {/* CSS VARIABLES FOR SVG */}
- <div
-  style={{
-    width,
-    "--grid": "rgb(203 213 225)",
-    "--text": "rgb(30 41 59)",      // slate-800 (light)
-    "--curve": "rgb(16 185 129)",   // emerald-500
-  }}
-  className="
-    dark:[--grid:rgba(255,255,255,0.35)]
-    dark:[--text:#ffffff]
-    dark:[--curve:#34d399]
-  "
->
-
+      <div
+        style={{
+          width,
+          "--grid": "rgb(203 213 225)",
+          "--text": "rgb(30 41 59)",
+          "--curve": "rgb(16 185 129)",
+        }}
+        className="
+          dark:[--grid:rgba(255,255,255,0.35)]
+          dark:[--text:#ffffff]
+          dark:[--curve:#34d399]
+        "
+      >
         <svg width={width} height={HEIGHT}>
-          {/* ===== GRADIENT ===== */}
+          {/* ===== DEFINITIONS ===== */}
           <defs>
             <linearGradient id="msnGradient" x1="0%" x2="100%">
               <stop offset="0%" stopColor="#60A5FA" />
@@ -103,7 +116,7 @@ const MSNWeatherChart = ({ data = [] }) => {
             </linearGradient>
 
             <mask id="fadeMask">
-              <rect x="0" y="0" width={width} height={HEIGHT} fill="url(#fadeDown)" />
+              <rect width={width} height={HEIGHT} fill="url(#fadeDown)" />
             </mask>
           </defs>
 
@@ -123,7 +136,7 @@ const MSNWeatherChart = ({ data = [] }) => {
             );
           })}
 
-          {/* ===== FILL ===== */}
+          {/* ===== AREA ===== */}
           <path
             d={fillPath}
             fill="url(#msnGradient)"
@@ -138,38 +151,36 @@ const MSNWeatherChart = ({ data = [] }) => {
             stroke="var(--curve)"
             strokeWidth="2.5"
           />
-{/* ===== LABELS ===== */}
-{data.map((d, i) => (
-  <g key={i}>
-    {/* Temperature */}
-    <text
-      x={points[i].x}
-      y={points[i].y - 18}
-      textAnchor="middle"
-      fill="var(--text)"
-      fontSize="15"
-      fontWeight="700"
-    >
-      {d.temp}°
-    </text>
 
-    {/* Time */}
-    <text
-      x={points[i].x}
-      y={26}
-      textAnchor="middle"
-      fill="var(--text)"
-      fontSize="12"
-      opacity="0.85"
-    >
-      {d.time}
-    </text>
-  </g>
-))}
+          {/* ===== LABELS ===== */}
+          {data.map((d, i) => (
+            <g key={i}>
+              <text
+                x={points[i].x}
+                y={points[i].y - 18}
+                textAnchor="middle"
+                fill="var(--text)"
+                fontSize="15"
+                fontWeight="700"
+              >
+                {d.temp}°
+              </text>
 
+              <text
+                x={points[i].x}
+                y={26}
+                textAnchor="middle"
+                fill="var(--text)"
+                fontSize="12"
+                opacity="0.85"
+              >
+                {d.time}
+              </text>
+            </g>
+          ))}
         </svg>
 
-        {/* ICON OVERLAY */}
+        {/* ===== ICON OVERLAY ===== */}
         <div
           className="relative pointer-events-none"
           style={{ marginTop: `-${HEIGHT}px`, height: HEIGHT }}

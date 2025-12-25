@@ -15,7 +15,7 @@ import {
   TrendingUp,
   TrendingDown
 } from "lucide-react";
-
+import AutocompleteSearch from "./AutocompleteSearch";
 import NewHeader from "./NewHeader";
 import Sidebar from "./Sidebar";
 import MSNWeatherChart from "./MSNWeatherChart";
@@ -272,22 +272,15 @@ const UnifiedCityPage = () => {
         </div>
 
         <div className="flex">
-          {/* SIDEBAR */}
-          <Sidebar
-            selectedCity={selectedCity}
-            setSelectedCity={setSelectedCity}
-            tempUnit={tempUnit}
-            setTempUnit={setTempUnit}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onSearchCity={handleSearchCity}
-            customCities={customCities}
-          />
+          
 
           {/* MAIN CONTENT */}
           <div className="flex-1 p-6 max-h-[calc(100vh-80px)] overflow-y-auto">
             <div className="max-w-7xl mx-auto">
-
+             {/* SEARCH BAR */}
+              <div className="mb-6">
+                <AutocompleteSearch />
+              </div>
               {/* TAB NAVIGATION */}
               <div className="flex gap-4 mb-6">
                 <button
